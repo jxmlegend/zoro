@@ -1,0 +1,218 @@
+C51 COMPILER V9.52.0.0   MAIN                                                              08/19/2017 08:12:19 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\keil4\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include <at89x51.h>
+   2          #define uchar unsigned char
+   3          #define uint unsigned int
+   4          #define IN P0
+   5          uchar pro_left,pro_right,i,j; //左右占空比标志
+   6          
+   7          sbit left1=P2^0;
+   8          sbit left2=P2^1;
+   9          sbit right1=P2^3;
+  10          sbit right2=P2^2;   
+  11          sbit en1=P1^0;      
+  12          sbit en2=P1^1;  
+  13          
+  14          uchar left_offset;  //偏左标志
+  15          uchar mid_offset;   //居中标志
+  16          uchar right_offset; //偏右标志
+  17          uchar stop;         //停车标志
+  18          void delay(uint z)
+  19          {
+  20   1        uchar i;
+  21   1        while(z--)
+  22   1        {
+  23   2          for(i=0;i<121;i++);
+  24   2        }
+  25   1      }
+  26          void init()
+  27          {
+  28   1        left_offset=0;  //初始化左偏标志
+  29   1        mid_offset=1;   //初始化居中标志
+  30   1        right_offset=0; //初始化右偏标志
+  31   1        TMOD=0X01; 
+  32   1        TH0=(65536-100)/256;
+  33   1        TL0=(65536-100)%256;
+  34   1        EA=1;
+  35   1        ET0=1;
+  36   1        TR0=1;
+  37   1        en1=1;
+  38   1        en2=1;
+  39   1      }
+  40          //使用中断做PWM发生器
+  41          void time0(void)interrupt 1
+  42          {
+  43   1        i++;
+  44   1        j++;
+  45   1        if(i<=pro_right){en1=1;}
+  46   1           else en1=0;
+  47   1        if(i==40) {en1=~en1;i=0;}
+  48   1        if(j<=pro_left) {en2=1;}
+  49   1           else en2=0;
+  50   1        if(j==40) {en2=~en2;j=0;}
+  51   1        TH0=(65536-100)/256;
+  52   1        TL0=(65536-100)%256;
+  53   1      
+  54   1      }
+  55          void straight() //直行函数
+C51 COMPILER V9.52.0.0   MAIN                                                              08/19/2017 08:12:19 PAGE 2   
+
+  56          {
+  57   1        pro_right=20;
+  58   1        pro_left=20;
+  59   1        left1=0;
+  60   1        left2=1;
+  61   1        right1=0;
+  62   1        right2=1;
+  63   1      
+  64   1      }
+  65          void turn_left() //左转调整函数
+  66          {
+  67   1        pro_right=30;
+  68   1        pro_left=30;
+  69   1        left1=1;
+  70   1        left2=0;
+  71   1        right1=0;
+  72   1        right2=1;
+  73   1      
+  74   1      }
+  75          void turn_right() //右转调整函数
+  76          {
+  77   1        pro_right=30;
+  78   1        pro_left=30;
+  79   1        left1=0;
+  80   1        left2=1;
+  81   1        right1=1;
+  82   1        right2=0;
+  83   1      
+  84   1      }
+  85          void turn_back() //倒车函数
+  86          {
+  87   1        left1=1;
+  88   1        left2=0;
+  89   1        right1=1;
+  90   1        right2=0;
+  91   1        pro_right=20;
+  92   1        pro_left=20;
+  93   1      
+  94   1      }
+  95          void turn_stop() //停车函数
+  96          {
+  97   1        left1=0;
+  98   1        left2=0;
+  99   1        right1=0;
+ 100   1        right2=0;
+ 101   1        pro_right=0;
+ 102   1        pro_left=0;   
+ 103   1      }
+ 104          void infrared() //循迹函数
+ 105          {
+ 106   1        uchar flag;
+ 107   1      
+ 108   1        if(IN==0xff) stop=1;
+ 109   1        else stop=0;
+ 110   1      
+ 111   1        while(!stop) //没有循迹停止，一直循迹下去
+ 112   1        { 
+ 113   2          switch(IN)
+ 114   2          {
+ 115   3            //居中状态
+ 116   3            case 0x10: left_offset=0; right_offset=0;mid_offset=1;stop=0;break;   //00010000
+ 117   3            case 0x08: left_offset=0; right_offset=0;mid_offset=1;stop=0;break;   //00001000
+C51 COMPILER V9.52.0.0   MAIN                                                              08/19/2017 08:12:19 PAGE 3   
+
+ 118   3            case 0x18: left_offset=0; right_offset=0;mid_offset=1;stop=0;break;   //00011000
+ 119   3            //偏右状态
+ 120   3            case 0x20: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;   //00100000
+ 121   3            case 0x40: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;   //01000000
+ 122   3            case 0x80: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;   //10000000
+ 123   3            case 0x30: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;   //00110000
+ 124   3            case 0x60: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;   //01100000
+ 125   3            case 0xc0: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;   //11000000
+ 126   3            
+ 127   3            //偏左状态
+ 128   3            case 0x04: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;   //00000100
+ 129   3            case 0x02: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;   //00000010
+ 130   3            case 0x01: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;   //00000001
+ 131   3            case 0x03: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;   //00001100
+ 132   3            case 0x06: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;   //00000110
+ 133   3            case 0x0c: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;   //00000011
+ 134   3      
+ 135   3            case 0xFF: stop=1; break;//循到路口黑线 left_offset=1; right_offset=1;mid_offset=1;
+ 136   3            case 0x00: left_offset=0; right_offset=0;mid_offset=0;stop=0;break;//出界
+ 137   3            default: break;
+ 138   3          }
+ 139   2          if(stop)
+ 140   2          {
+ 141   3            turn_stop(); delay(5000);
+ 142   3          }
+ 143   2          else
+ 144   2          {
+ 145   3            TR0=1;
+ 146   3            if(left_offset==1)
+ 147   3               {flag=1;}
+ 148   3            else
+ 149   3            if(right_offset==1)
+ 150   3               {flag=2;}
+ 151   3            else
+ 152   3            if((left_offset==0)&(mid_offset==0)&(right_offset==0))   //出界，倒车
+ 153   3               {flag=3;stop=0;}
+ 154   3            else {flag=0;}                       //未知状态，直行
+ 155   3               
+ 156   3            switch (flag)
+ 157   3            {
+ 158   4              case 0: straight();     break;
+ 159   4              case 1: turn_right();   break;
+ 160   4              case 2: turn_left();  break;
+ 161   4              case 3: turn_back();    break;        
+ 162   4              default:          break;
+ 163   4            }
+ 164   3          } 
+ 165   2        }
+ 166   1      }
+ 167          void main(void)
+ 168          {
+ 169   1         init();  
+ 170   1         infrared();
+ 171   1         delay(2500);
+ 172   1         turn_left() ;
+ 173   1         delay(2500);
+ 174   1         infrared();
+ 175   1         delay(2500);
+ 176   1         turn_right();
+ 177   1         delay(2500);
+ 178   1         delay(2500);
+ 179   1         infrared();
+C51 COMPILER V9.52.0.0   MAIN                                                              08/19/2017 08:12:19 PAGE 4   
+
+ 180   1         delay(2500);
+ 181   1         turn_left() ;
+ 182   1         delay(2500);
+ 183   1         infrared();
+ 184   1         delay(2500);
+ 185   1         turn_right();
+ 186   1         delay(2500);
+ 187   1         infrared();
+ 188   1         delay(2500); 
+ 189   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    562    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

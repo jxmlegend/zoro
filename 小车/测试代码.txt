@@ -1,0 +1,124 @@
+#include<reg51.h>
+#define uchar unsigned char
+#define uint unsigned int
+uchar pro_left,pro_right,i,j; //左右占空比标志
+
+sbit left1=P2^0;
+sbit left2=P2^1;
+sbit right1=P2^2;
+sbit right2=P2^3;   
+sbit en1=P1^0;      
+sbit en2=P1^1;
+     
+uchar left_offset;  //偏左标志
+uchar mid_offset;   //居中标志
+uchar right_offset; //偏右标志
+uchar stop;         //停车标志
+void delay(uint z)
+{
+	uchar i;
+	while(z--)
+	{
+		for(i=0;i<121;i++);
+	}
+}
+void init()
+{
+	left_offset=0;  //初始化左偏标志
+	mid_offset=1;   //初始化居中标志
+	right_offset=0; //初始化右偏标志
+	TMOD=0X01; 
+	TH0=(65536-100)/256;
+	TL0=(65536-100)%256;
+	EA=1;
+	ET0=1;
+	TR0=1;
+	en1=1;
+	en2=1;
+}
+//使用中断做PWM发生器
+void time0(void)interrupt 1
+{
+	i++;
+	j++;
+	if(i<=pro_right){en1=1;}
+		 else en1=0;
+	if(i==40) {en1=~en1;i=0;}
+	if(j<=pro_left) {en2=1;}
+		 else en2=0;
+	if(j==40) {en2=~en2;j=0;}
+	TH0=(65536-100)/256;
+	TL0=(65536-100)%256;
+}
+void straight() //直行函数
+{
+	pro_right=39;
+	pro_left=39;
+	left1=0;
+	left2=1;
+	right1=1;
+	right2=0;
+
+}
+void turn_left() //左转调整函数
+{
+	pro_right=30;
+	pro_left=30;
+	left1=0;
+	left2=1;
+	right1=0;
+	right2=1;
+
+}
+void turn_right() //右转调整函数
+{
+	pro_right=30;
+	pro_left=30;
+	left1=1;
+	left2=0;
+	right1=1;
+	right2=0;
+
+}
+void turn_back() //倒车函数
+{
+	left1=1;
+	left2=0;
+	right1=0;
+	right2=1;
+	pro_right=39;
+	pro_left=39;
+
+}
+void turn_stop() //停车函数
+{
+	left1=0;
+	left2=0;
+	right1=0;
+	right2=0;
+	pro_right=0;
+	pro_left=0;	 	
+}
+
+void main(void)
+{
+	init();
+	delay(5000);
+	straight(); //直行函数
+	delay(5000);
+	turn_back(); //倒车函数
+	delay(5000);
+	turn_left(); //左转调整函数
+	delay(5000);
+	turn_right(); //右转调整函数
+	delay(5000);
+	turn_stop(); //停车函数
+	delay(1000);
+	
+		
+	 while(1);
+}
+void int0(void)interrupt 0
+{
+
+}

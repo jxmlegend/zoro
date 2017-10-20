@@ -1,0 +1,65 @@
+void infrared() //循迹函数
+{
+	uchar flag;
+	uchar temp;
+
+	if(P0==0xff) stop=1;
+	else stop=0;
+
+	while(!stop) //没有循迹停止，一直循迹下去
+	{
+		temp=P0;
+		switch(temp)
+		{
+			//居中状态
+			case 0x10: left_offset=0; right_offset=0;mid_offset=1;stop=0;break;	  //00010000
+			case 0x08: left_offset=0; right_offset=0;mid_offset=1;stop=0;break;	  //00001000
+			case 0x18: left_offset=0; right_offset=0;mid_offset=1;stop=0;break;   //00011000
+			//偏右状态
+			case 0x20: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;	  //00100000
+			case 0x40: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;	  //01000000
+			case 0x80: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;	  //10000000
+			case 0x30: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;	  //00110000
+			case 0x60: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;	  //01100000
+			case 0xc0: left_offset=0; right_offset=1;mid_offset=0;stop=0;break;	  //11000000
+			
+			//偏左状态
+			case 0x04: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;	  //00000100
+			case 0x02: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;	  //00000010
+			case 0x01: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;	  //00000001
+			case 0x03: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;	  //00001100
+			case 0x06: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;	  //00000110
+			case 0x0c: left_offset=1; right_offset=0;mid_offset=0;stop=0;break;	  //00000011
+
+			case 0xFF: stop=1; break;//循到路口黑线 left_offset=1; right_offset=1;mid_offset=1;
+			case 0x00: left_offset=0; right_offset=0;mid_offset=0;stop=0;break;//出界
+			default: break;
+		}
+		if(stop)
+		{
+			turn_stop(); delay(5000);
+		}
+		else
+		{
+			TR0=1;
+			if(left_offset==1)
+				 {flag=1;}
+			else
+			if(right_offset==1)
+				 {flag=2;}
+			else
+			if((left_offset==0)&(mid_offset==0)&(right_offset==0))	 //出界，倒车
+				 {flag=3;stop=0;}
+			else {flag=0;}											 //未知状态，直行
+				 
+			switch (flag)
+			{
+				case 0: straight();	  	break;
+				case 1: turn_right();  	break;
+				case 2: turn_left(); 	break;
+				case 3: turn_back();  	break;	 			
+				default:   		 		break;
+			}
+		} 
+	}
+}
