@@ -1,0 +1,104 @@
+C51 COMPILER V9.56.0.0   RC                                                                11/05/2017 17:57:24 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE RC
+OBJECT MODULE PLACED IN ..\obj\RC.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\nrf24l01\RC.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\src\nrf24l01;..\sr
+                    -c\ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\light;..\src\motor;..\s
+                    -rc\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\RC.lst) TABS(2) OBJECT(..\obj\RC.obj)
+
+line level    source
+
+   1          #include "RC.h"
+   2          #include "NRF24L01.H"
+   3          #include "delay.h"
+   4          #include "uart.h"
+   5          
+   6          uchar CheckSum(uchar *pbuf,uchar num);
+   7          void NRF24L01_transmit(uchar cmd)
+   8          {
+   9   1         u8 tmp_buf[5];
+  10   1         tmp_buf[0]=0xaa;
+  11   1         tmp_buf[1]=0xbb;
+  12   1          switch(cmd)
+  13   1          {
+  14   2            case Light_1:     
+  15   2                             tmp_buf[2]=0x49;//1等
+  16   2                             tmp_buf[3]=0x68; 
+  17   2                             break;
+  18   2            case Light_2:    tmp_buf[2]=0x50;//2等
+  19   2                             tmp_buf[3]=0x68;
+  20   2                             break;     
+  21   2            case Light_3:    tmp_buf[2]=0x51;//3等
+  22   2                             tmp_buf[3]=0x68;
+  23   2                             break;     
+  24   2            case Light_4:    tmp_buf[2]=0x52;//4等
+  25   2                             tmp_buf[3]=0x68;       
+  26   2                             break;     
+  27   2            case ZhaDao:     tmp_buf[2]=0x84;//抬起
+  28   2                             tmp_buf[3]=0x81; 
+  29   2                             break;     
+  30   2            case Alert_led:  tmp_buf[2]=0x66;//警灯
+  31   2                             tmp_buf[3]=0x68;
+  32   2                             break; 
+  33   2            case Light_off:  tmp_buf[2]=0x53;//警灯
+  34   2                             tmp_buf[3]=0x68;
+  35   2                             break;
+  36   2            default:         tmp_buf[2]=0x00;
+  37   2                             tmp_buf[3]=0x00;
+  38   2                             break;                            
+  39   2          }
+  40   1            tmp_buf[4]=CheckSum(tmp_buf,4);   
+  41   1           if(NRF24L01_TxPacket(tmp_buf)==TX_OK)
+  42   1            {   
+  43   2               uart_senddata(0x66) ;   
+  44   2           } 
+  45   1      } 
+  46          
+  47          /*
+  48           函数功能：  校验和
+  49           返回：      数组和取反的值
+  50          */
+  51          uchar CheckSum(uchar *pbuf,uchar num)
+  52          {
+  53   1         uchar temp = 0;
+C51 COMPILER V9.56.0.0   RC                                                                11/05/2017 17:57:24 PAGE 2   
+
+  54   1          for(;num>0;num--)
+  55   1          {
+  56   2             temp+=*pbuf++;     
+  57   2          }
+  58   1          temp=~temp;
+  59   1         return (uchar)temp;
+  60   1      }
+  61          
+  62          
+  63          /**************************************************************************
+  64          函数功能：无线模块自检
+  65          入口参数：无
+  66          返回  值：无
+  67          **************************************************************************/
+  68          void NRF24L01_FindMyself(void)
+  69          {
+  70   1          while(NRF24L01_Check())//检测不到24L01
+  71   1        {
+  72   2             BEEP=!BEEP;//DS0闪烁
+  73   2             Delay300ms();
+  74   2        }
+  75   1         BEEP=1;
+  76   1      }
+  77          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    184    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

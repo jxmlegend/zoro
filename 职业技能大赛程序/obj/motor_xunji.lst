@@ -1,0 +1,414 @@
+C51 COMPILER V9.56.0.0   MOTOR_XUNJI                                                       11/05/2017 17:57:22 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MOTOR_XUNJI
+OBJECT MODULE PLACED IN ..\obj\motor_xunji.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\motor\motor_xunji.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\src\nrf24l01
+                    -;..\src\ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\light;..\src\moto
+                    -r;..\src\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\motor_xunji.lst) TABS(2) OBJECT(..\obj\motor_xu
+                    -nji.obj)
+
+line level    source
+
+   1          #include "commom.h"
+   2          #include "delay.h"
+   3          #include "motor.h"
+   4          #include "Infrared_emission.h"
+   5          #include "STC12C5A60S2_PWM.h"
+   6          #include "motor_xunji.h"
+   7          #include "dth.h"
+   8          #include "uart.h"
+   9          #include "STC_BH1750_nicete.h"
+  10          #include "RC.h"
+  11          #include "NRF24L01.H"
+  12          
+  13          /****************************************************
+  14          全局变量：
+  15          renwu_flag：   任务运行标志位，为1时表示正在执行任务
+  16          Alert_flag：   任务类标志位，Alert_flag的值表示正在执行第几号任务
+  17          heixian_flag： 小车循迹板全部检测到黑线时为0，该标志位的作用在于，
+  18                         防止小车经过一个路口时，Alert_flag增加多次，影响
+  19                         任务的执行。
+  20          *******************************************************/
+  21          
+  22          uchar renwu_flag=0,Alert_flag=0,heixian_flag=1,Alert_flag_back=0;   
+  23          volatile uchar Alert_flag_F=0;
+  24          extern stddis;
+  25          
+  26          
+  27          /********************************************************
+  28          宏定义：
+  29                  小车路口转弯，时间控制
+  30               根据小车运行状况，可调节时间的大小
+  31           *********************************************************/
+  32          #define  FORWARD_time  1000 //路口转弯时间控制
+  33          #define  LEFT_time     3000
+  34          
+  35          /*
+  36          参数：channel 采样通道
+  37          函数功能：
+  38          采集调光单元的光强值，并使调光单元的光强等级处于第三级
+  39          参数： 需要设置的光照等级
+  40          */
+  41          void ADC_capture_task(uchar Standard_Leve);
+  42          /*后退循迹函数*/
+  43          void Back_FollowLine(void);
+  44          /*蜂鸣器发声*/
+  45          void beep(uint ring_time);
+  46          
+  47          /*
+  48          函数功能：
+  49              小车左转，PWM改变
+  50          */
+  51          void Car_turnLeft(uint time1,uint time2)
+  52          {
+C51 COMPILER V9.56.0.0   MOTOR_XUNJI                                                       11/05/2017 17:57:22 PAGE 2   
+
+  53   1          MOTOR_GO_FORWARD; 
+  54   1          Delay_1ms(time1); 
+  55   1          PWM_Set(60,50);
+  56   1          MOTOR_GO_LEFT;
+  57   1          Delay_1ms(time2);
+  58   1      }
+  59          
+  60          void Car_turnRight(uint time1,uint time2)
+  61          {
+  62   1          MOTOR_GO_FORWARD; 
+  63   1          Delay_1ms(time1); 
+  64   1          PWM_Set(60,50);
+  65   1          MOTOR_GO_RIGHT;
+  66   1          Delay_1ms(time2);
+  67   1      }
+  68          
+  69          //void Car_turnLeft(uint time1,uint time2)
+  70          //{
+  71          //      unsigned int t=50000;
+  72          //      volatile uchar xj_data;
+  73          //      do
+  74          //      { 
+  75          //        PWM_Set(70,70);
+  76          //        MOTOR_GO_FORWARD; 
+  77          //      }
+  78          //      while(t--);
+  79          //      do{
+  80          //          PWM_Set(65,65);
+  81          //          MOTOR_GO_LEFT ; 
+  82          //         //xj_data=P0;
+  83          //      }
+  84          //      while(xunji<255);
+  85          //      Delay_1ms(100);
+  86          //      do{
+  87          //          PWM_Set(65,65);
+  88          //          MOTOR_GO_LEFT ; 
+  89          //          xj_data=P0;
+  90          //      }
+  91          //      while(xj_data==255);
+  92          //}
+  93          
+  94          void RIGHT_LED_ON(void)   //开旋转LED灯、并显示温度
+  95          {
+  96   1      
+  97   1          static uchar ON_success=0;  
+  98   1        
+  99   1          MOTOR_GO_FORWARD;
+ 100   1          Delay_1ms(500);
+ 101   1          MOTOR_GO_LEFT;
+ 102   1          Delay_1ms(1500);
+ 103   1          MOTOR_GO_STOP; 
+ 104   1          Delay_1ms(1000);
+ 105   1      
+ 106   1          if(ON_success==0)    //只开一次，旋转LED灯
+ 107   1          { 
+ 108   2            Multiple_sendIRdata(1,0x00,0x11);//发送开旋转LED指令,发送指令的次数根据实际情况，增加或减少
+ 109   2            ON_success=1;
+ 110   2          } 
+ 111   1          Delay_1ms(10000);
+ 112   1          
+ 113   1          
+ 114   1          Multiple_send_Temp_IRdata(4,0xf2); //发送红外温度数据
+C51 COMPILER V9.56.0.0   MOTOR_XUNJI                                                       11/05/2017 17:57:22 PAGE 3   
+
+ 115   1          
+ 116   1          MOTOR_GO_RIGHT;
+ 117   1          Delay_1ms(2000);
+ 118   1      }
+ 119          
+ 120          void FollowLine(void)
+ 121          {  
+ 122   1            switch(xunji)
+ 123   1           {
+ 124   2                case 0x1F:
+ 125   2                case 0x2f:
+ 126   2                case 0x3f:
+ 127   2                case 0x4f:
+ 128   2                case 0x5f:
+ 129   2                case 0x6f:
+ 130   2                case 0x7F:
+ 131   2                case 0x8f:
+ 132   2                case 0x9f:
+ 133   2                case 0xaf:
+ 134   2                case 0xbf: 
+ 135   2                case 0xcf:            
+ 136   2                case 0xdF:
+ 137   2                case 0xEF:MOTOR_GO_RIGHT; heixian_flag=1; break;    
+ 138   2                
+ 139   2                case 0xF1:
+ 140   2                case 0xf2:
+ 141   2                case 0xf3:
+ 142   2                case 0xf4:
+ 143   2                case 0xf5:
+ 144   2                case 0xf6:
+ 145   2                case 0xF7:
+ 146   2                case 0xf8:
+ 147   2                case 0xf9:
+ 148   2                case 0xfa:
+ 149   2                case 0xfb:
+ 150   2                case 0xfc:            
+ 151   2                case 0xFd:
+ 152   2                case 0xFe:MOTOR_GO_LEFT; heixian_flag=1; break;     
+ 153   2             
+ 154   2                case 0xE7:MOTOR_GO_FORWARD; heixian_flag=1; break;            
+ 155   2                case 0xFF:/*MOTOR_GO_STOP;*/  break;    
+ 156   2                case 0x00:  
+ 157   2                        if(heixian_flag)
+ 158   2                       {
+ 159   3                        MOTOR_GO_STOP; Delay_1ms(30); ++Alert_flag;renwu_flag=1;heixian_flag=0;                           
+ 160   3                       }  break;             
+ 161   2                default:  MOTOR_GO_FORWARD;  heixian_flag=1;break;
+ 162   2           } 
+ 163   1      }
+ 164            
+ 165          /*
+ 166          函数功能：
+ 167          小车执行任务函数
+ 168          根据，十字路口crossroads_count计数值，来运行相关控制程序
+ 169          参数：crossroads_count十字路口的个数
+ 170          */
+ 171          void car_task(u8 crossroads_count)
+ 172          {
+ 173   1        static u8 set_flag=1,set_flag1=1;
+ 174   1        if(renwu_flag)
+ 175   1        {   
+ 176   2            set_flag=1; 
+C51 COMPILER V9.56.0.0   MOTOR_XUNJI                                                       11/05/2017 17:57:22 PAGE 4   
+
+ 177   2            if(set_flag1==1)
+ 178   2            {
+ 179   3              PWM_Set(59,59);/*加快转弯速度*//*加快转弯速度*/
+ 180   3              set_flag1=0;
+ 181   3            }
+ 182   2            switch(crossroads_count)
+ 183   2            {
+ 184   3                  case 1 :        zigbee_transmint_data(0x0000,Dot_Matrix_CMD,5,6);
+ 185   3                                  delay_ms(250);delay_ms(250);
+ 186   3                                  zigbee_transmint_data(0x0000,Dot_Matrix_CMD,5,6);
+ 187   3                                  delay_ms(250);delay_ms(250);
+ 188   3                                  zigbee_transmint_data(0x0000,Dot_Matrix_CMD,5,6);
+ 189   3                                  delay_ms(250);delay_ms(250);
+ 190   3                                  Car_turnLeft(FORWARD_time,LEFT_time);//小车左转
+ 191   3                                  break;
+ 192   3                  case 2 :        
+ 193   3                                  Car_turnLeft(FORWARD_time,LEFT_time);                       
+ 194   3                                  break;
+ 195   3                  case 3 :        NRF24L01_transmit(Alert_led);
+ 196   3                                  MOTOR_GO_FORWARD;
+ 197   3                                  delay_ms(200);
+ 198   3                                  MOTOR_GO_STOP;
+ 199   3                                  break;
+ 200   3                  case 4 :        stddis=0;
+ 201   3                                  MOTOR_GO_FORWARD;
+ 202   3                                  delay_ms(200);
+ 203   3                                  MOTOR_GO_STOP;
+ 204   3                                  break;
+ 205   3                  case 5 :        NRF24L01_transmit(Light_4);//左转弯 
+ 206   3                                  MOTOR_GO_STOP;
+ 207   3                                  delay_ms(400);
+ 208   3                                  MOTOR_GO_BACK;
+ 209   3                                  delay_ms(800);
+ 210   3                                  Car_turnRight(FORWARD_time,LEFT_time);
+ 211   3                                  MOTOR_GO_STOP;  
+ 212   3                                  stddis=1;
+ 213   3                                  break;
+ 214   3                  case 6:         Car_turnRight(FORWARD_time,LEFT_time);
+ 215   3                                  EA=1;                           //定时计数初使化 ;//开中断，颜色识别红灯
+ 216   3                                  TR0=1;           //启动
+ 217   3                                  TR1=1;
+ 218   3                                  break;                          
+ 219   3                  case 7:         EA=0;//关中断
+ 220   3                                  TR0=0;           //停止颜色识别
+ 221   3                                  TR1=1;
+ 222   3                                  MOTOR_GO_FORWARD;
+ 223   3                                  Delay_1ms(200);
+ 224   3                                  break;
+ 225   3                  case 8:         Car_turnLeft(FORWARD_time,LEFT_time);
+ 226   3                                  MOTOR_GO_FORWARD;
+ 227   3                                  delay_ms(200);
+ 228   3                                  MOTOR_GO_STOP;
+ 229   3                                  MOTOR_GO_LEFT;
+ 230   3                                  delay_ms(200);
+ 231   3                                  MOTOR_GO_STOP;
+ 232   3                                  Multiple_sendIRdata(2,0x00,0x11); 
+ 233   3                                  MOTOR_GO_RIGHT;
+ 234   3                                  delay_ms(200);
+ 235   3                                  MOTOR_GO_STOP;     
+ 236   3                                  break;
+ 237   3                  case 9:         NRF24L01_transmit(ZhaDao);
+ 238   3                                  Car_turnLeft(FORWARD_time,LEFT_time);
+C51 COMPILER V9.56.0.0   MOTOR_XUNJI                                                       11/05/2017 17:57:22 PAGE 5   
+
+ 239   3                                  break;
+ 240   3                  case 10:        MOTOR_GO_FORWARD;
+ 241   3                                  delay_ms(200);
+ 242   3                                  MOTOR_GO_STOP;
+ 243   3                                  break;   
+ 244   3      //                            NRF24L01_transmit(Alert_led);   
+ 245   3      //                            zigbee_control=0;
+ 246   3      //                            delay_ms(10);
+ 247   3      //                            zigbee_control=1; 
+ 248   3      //                            Car_turnLeft(FORWARD_time,LEFT_time);//小车左转 
+ 249   3      //                            break;
+ 250   3                  case 11:        MOTOR_GO_FORWARD;
+ 251   3                                  delay_ms(200);
+ 252   3                                  MOTOR_GO_STOP;
+ 253   3                                  break;                               
+ 254   3      //                             MOTOR_GO_FORWARD;
+ 255   3      //                             delay_ms(100); 
+ 256   3      //                             Alert_flag=0;//循环结束，路口变量清零
+ 257   3      //                             break;   
+ 258   3                   case 12:       MOTOR_GO_STOP;
+ 259   3                                  break;
+ 260   3                                  /*其他路口不让小车停*/                                           
+ 261   3                 default:         MOTOR_GO_STOP;
+ 262   3                                  break;                    
+ 263   3            }
+ 264   2            renwu_flag=0;     
+ 265   2        }else
+ 266   1        {
+ 267   2              if(set_flag)
+ 268   2              {  
+ 269   3                PWM_Set(70,70);/*走直线速度降慢*/
+ 270   3                set_flag=0;
+ 271   3                set_flag1=1;
+ 272   3              }  
+ 273   2        }   
+ 274   1      }
+ 275          
+ 276          /*
+ 277          参数：channel 采样通道
+ 278          函数功能：
+ 279          采集调光单元的光强值，并使调光单元的光强等级Standard_Leve
+ 280          参数： 需要设置的光照等级
+ 281          */
+ 282          void ADC_capture_task(uchar Standard_Leve)
+ 283          {
+ 284   1           uchar  i,RING_COUNT=2,RING_TIME=100;
+ 285   1           uchar  Lightleve=0;
+ 286   1           volatile int ADNum=0;             
+ 287   1           while(Lightleve!=Standard_Leve)
+ 288   1          {   
+ 289   2             Single_Write_BH1750(0x01);    // power on
+ 290   2             Single_Write_BH1750(0x10);    // H- resolution mode
+ 291   2             Delay180ms();                 //延时180ms
+ 292   2             Multiple_read_BH1750();       
+ 293   2             ADNum=BUF[0];
+ 294   2             ADNum=(ADNum*256)+BUF[1];
+ 295   2              if(ADNum>0&&ADNum<120)
+ 296   2              { 
+ 297   3              Lightleve=0x01;
+ 298   3              RING_COUNT=1;RING_TIME=700;
+ 299   3              }
+ 300   2              else if(ADNum>120&&ADNum<300)        
+C51 COMPILER V9.56.0.0   MOTOR_XUNJI                                                       11/05/2017 17:57:22 PAGE 6   
+
+ 301   2              {Lightleve=0x02;
+ 302   3               RING_COUNT=2;RING_TIME=500;
+ 303   3              }
+ 304   2              else if(ADNum>300&&ADNum<650)
+ 305   2              {Lightleve=0x03;
+ 306   3               RING_COUNT=3;RING_TIME=300;
+ 307   3              }
+ 308   2              else if(ADNum>650&&ADNum<2500)
+ 309   2              {Lightleve=0x04;
+ 310   3               RING_COUNT=4;RING_TIME=100;
+ 311   3              }   
+ 312   2              if(Lightleve!=Standard_Leve)
+ 313   2              // Ctrl_FM_transmitting(0x03,0xb0);   
+ 314   2              {
+ 315   3                      NRF24L01_transmit(Light_3);
+ 316   3              }         
+ 317   2                  for(i=0;i<RING_COUNT;i++)
+ 318   2                     beep(RING_TIME); 
+ 319   2         }         
+ 320   1      }
+ 321          
+ 322          /*蜂鸣器发声*/
+ 323          void beep(uint ring_time)
+ 324          {
+ 325   1           BEEP=0;
+ 326   1           delay_ms(ring_time);
+ 327   1           BEEP=1;
+ 328   1           delay_ms(ring_time);
+ 329   1      }
+ 330          
+ 331          /*后退循迹函数*/
+ 332          void Back_FollowLine(void)
+ 333          { 
+ 334   1         PWM_Set(70,70);/*走直线速度降慢*/
+ 335   1           switch(xunji)
+ 336   1           {
+ 337   2                case 0x1F:
+ 338   2                case 0x2f:
+ 339   2                case 0x3f:
+ 340   2                case 0x4f:
+ 341   2                case 0x5f:
+ 342   2                case 0x6f:
+ 343   2                case 0x7F:
+ 344   2                case 0x8f:
+ 345   2                case 0x9f:
+ 346   2                case 0xaf:
+ 347   2                case 0xbf:
+ 348   2                case 0xcf:            
+ 349   2                case 0xdF:
+ 350   2                case 0xEF:MOTOR_GO_RIGHT; heixian_flag=1; break;    
+ 351   2                
+ 352   2                case 0xF1:
+ 353   2                case 0xf2:
+ 354   2                case 0xf3:
+ 355   2                case 0xf4:
+ 356   2                case 0xf5:
+ 357   2                case 0xf6:
+ 358   2                case 0xF7:
+ 359   2                case 0xf8:
+ 360   2                case 0xf9:
+ 361   2                case 0xfa:
+ 362   2                case 0xfb:
+C51 COMPILER V9.56.0.0   MOTOR_XUNJI                                                       11/05/2017 17:57:22 PAGE 7   
+
+ 363   2                case 0xfc:            
+ 364   2                case 0xFd:
+ 365   2                case 0xFe:MOTOR_GO_LEFT; heixian_flag=1; break; 
+ 366   2                          
+ 367   2                case 0xE7:MOTOR_GO_BACK; heixian_flag=1; break;    
+ 368   2                case 0xFF:MOTOR_GO_STOP;   break;   
+ 369   2                case 0x00:  
+ 370   2                        if(heixian_flag)
+ 371   2                       {
+ 372   3                         MOTOR_GO_STOP;  Alert_flag_back=1;heixian_flag=0;                            
+ 373   3                       }  break;             
+ 374   2                default:  MOTOR_GO_BACK; heixian_flag=1; break;
+ 375   2           } 
+ 376   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1192    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8      14
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

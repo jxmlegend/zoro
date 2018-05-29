@@ -1,0 +1,104 @@
+C51 COMPILER V9.56.0.0   UART                                                              11/05/2017 17:57:21 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN ..\obj\uart.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\uart\uart.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\src\nrf24l01;..\src\
+                    -ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\light;..\src\motor;..\src
+                    -\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\uart.lst) TABS(2) OBJECT(..\obj\uart.obj)
+
+line level    source
+
+   1          #include "uart.h"
+   2          #include "delay.h"
+   3          #include "RC.h"
+   4          
+   5          
+   6          
+   7          void UartInit(void)   //9600bps@11.0592MHz
+   8          {
+   9   1        PCON &= 0x7F;   //波特率不倍速
+  10   1        SCON = 0x50;    //8位数据,可变波特率
+  11   1        AUXR |= 0x04;   //独立波特率发生器时钟为Fosc,即1T
+  12   1        BRT = 0xDC;   //设定独立波特率发生器重装值
+  13   1        AUXR |= 0x01;   //串口1选择独立波特率发生器为波特率发生器
+  14   1        AUXR |= 0x10;   //启动独立波特率发生器
+  15   1        TI=1;
+  16   1      }
+  17          
+  18          void uart_senddata(uchar ch)//向串口发送数据
+  19          {
+  20   1      
+  21   1         SBUF=ch;
+  22   1         while(TI==0); //等待发送完成
+  23   1        TI=0;
+  24   1      }
+  25          
+  26          void uart_BYTE (uchar *p,uchar length)
+  27          {
+  28   1          while(length!=0)
+  29   1          {
+  30   2            uart_senddata(*p);
+  31   2          p++;
+  32   2          length--;
+  33   2          }
+  34   1      }
+  35          
+  36           
+  37          void zigbee_transmint_data(uint address,uchar cmd,uchar SeqNum, uchar Ctrl)
+  38          {
+  39   1          u8 tmp_buf[9];
+  40   1          tmp_buf[0]=0xcc;                 //帧头
+  41   1          tmp_buf[1]=0x33;
+  42   1          tmp_buf[2]=address>>8;          //与被控装置连接的zigbee模块的16位地址；
+  43   1          tmp_buf[3]=address&0x00ff;
+  44   1          tmp_buf[4]=0x55;
+  45   1          tmp_buf[5]=cmd;
+  46   1          switch (tmp_buf[5]) 
+  47   1          {
+  48   2            case Controlled_Car_CMD:    
+  49   2              tmp_buf[6]=SeqNum;
+  50   2              tmp_buf[7]=Ctrl;
+  51   2              break;
+  52   2            case Dot_Matrix_CMD:
+  53   2              if(SeqNum<1)          SeqNum=1;
+C51 COMPILER V9.56.0.0   UART                                                              11/05/2017 17:57:21 PAGE 2   
+
+  54   2              else if(SeqNum>6)     SeqNum=6;
+  55   2              tmp_buf[6]=SeqNum;
+  56   2              if(Ctrl<1)          Ctrl=1;
+  57   2              else if(Ctrl>60)    Ctrl=60;
+  58   2              tmp_buf[7]=Ctrl;
+  59   2              break;
+  60   2            case Controlled_Rotating_LED:
+  61   2              tmp_buf[6]=0x01;
+  62   2              tmp_buf[7]=0xFE;
+  63   2              break;                    
+  64   2            case Controlled_Warning_Light:
+  65   2              tmp_buf[6]=0x01;
+  66   2              tmp_buf[7]=0xFE;
+  67   2              break;  
+  68   2            case Controlled_Gateway :
+  69   2              tmp_buf[6]=0x01;
+  70   2              tmp_buf[7]=0xFE;
+  71   2              break;
+  72   2          }
+  73   1          tmp_buf[8]=CheckSum((tmp_buf+4),4);//注意此处：只求和并取反  tmp_buf[4]到temp_buf[7]之间的数据
+  74   1      //    U1_printf(tmp_buf);
+  75   1          uart_BYTE(tmp_buf,9);
+  76   1          
+  77   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    173    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      14
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

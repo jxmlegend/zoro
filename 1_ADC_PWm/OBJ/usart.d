@@ -1,8 +1,8 @@
 ..\obj\usart.o: ..\MY\usart\usart.c
-..\obj\usart.o: E:\keil\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\usart.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\usart.o: ..\CMSIS\stm32f10x.h
 ..\obj\usart.o: ..\CMSIS\core_cm3.h
-..\obj\usart.o: E:\keil\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\usart.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\usart.o: ..\CMSIS\system_stm32f10x.h
 ..\obj\usart.o: ..\USER\stm32f10x_conf.h
 ..\obj\usart.o: ..\FWLib\inc\stm32f10x_adc.h

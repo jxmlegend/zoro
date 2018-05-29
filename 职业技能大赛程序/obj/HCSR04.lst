@@ -1,0 +1,52 @@
+C51 COMPILER V9.56.0.0   HCSR04                                                            11/05/2017 17:57:25 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE HCSR04
+OBJECT MODULE PLACED IN ..\obj\HCSR04.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\HCSR04\HCSR04.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\src\nrf24l01;..\
+                    -src\ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\light;..\src\motor;..
+                    -\src\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\HCSR04.lst) TABS(2) OBJECT(..\obj\HCSR04.obj)
+
+line level    source
+
+   1          #include "HCSR04.h"
+   2          #include "uart.h"
+   3          #include "delay.h"
+   4          
+   5          
+   6          float distance(void)
+   7          {
+   8   1        float dis;
+   9   1        uint disbuff=0;
+  10   1        uint x,y;
+  11   1        Trig=1;
+  12   1        delay_us(30);
+  13   1        Trig=0;
+  14   1        while(Echo==0);
+  15   1        while(Echo==1)
+  16   1        {   
+  17   2          for(x=1;x>0;x--)
+  18   2          for(y=113;y>0;y--);
+  19   2          disbuff++;
+  20   2        } 
+  21   1        dis=disbuff*0.17;
+  22   1        disbuff=0;
+  23   1        return dis;
+  24   1      }
+  25          
+  26          
+  27            
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     82    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

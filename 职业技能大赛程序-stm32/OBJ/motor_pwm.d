@@ -1,0 +1,15 @@
+..\obj\motor_pwm.o: ..\HARDWARE\motor\motor_pwm.c
+..\obj\motor_pwm.o: ..\HARDWARE\motor\motor_pwm.h
+..\obj\motor_pwm.o: ..\SYSTEM\sys\sys.h
+..\obj\motor_pwm.o: ..\USER\stm32f10x.h
+..\obj\motor_pwm.o: ..\CORE\core_cm3.h
+..\obj\motor_pwm.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\motor_pwm.o: ..\USER\system_stm32f10x.h
+..\obj\motor_pwm.o: ..\USER\stm32f10x_conf.h
+..\obj\motor_pwm.o: ..\STM32F10x_FWLib\inc\stm32f10x_gpio.h
+..\obj\motor_pwm.o: ..\USER\stm32f10x.h
+..\obj\motor_pwm.o: ..\STM32F10x_FWLib\inc\stm32f10x_rcc.h
+..\obj\motor_pwm.o: ..\STM32F10x_FWLib\inc\stm32f10x_tim.h
+..\obj\motor_pwm.o: ..\STM32F10x_FWLib\inc\stm32f10x_usart.h
+..\obj\motor_pwm.o: ..\STM32F10x_FWLib\inc\misc.h
+..\obj\motor_pwm.o: ..\HARDWARE\LED\led.h

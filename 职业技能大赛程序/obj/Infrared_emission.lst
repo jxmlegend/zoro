@@ -1,0 +1,128 @@
+C51 COMPILER V9.56.0.0   INFRARED_EMISSION                                                 11/05/2017 17:57:23 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE INFRARED_EMISSION
+OBJECT MODULE PLACED IN ..\obj\Infrared_emission.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\Infrared Sensor\Infrared_emission.c OPTIMIZE(8,SPEED) BROWSE INCDIR
+                    -(..\src\nrf24l01;..\src\ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\l
+                    -ight;..\src\motor;..\src\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\Infrared_emission.lst) TABS(2) 
+                    -OBJECT(..\obj\Infrared_emission.obj)
+
+line level    source
+
+   1          #include "Infrared_emission.h"
+   2          #include "IR_delay.h"
+   3          #include "delay.h"
+   4          #include "dth.h"
+   5          #include "uart.h"
+   6          
+   7           void SendIRdata_BYTE(unsigned char irdata)
+   8           {
+   9   1         unsigned char i;
+  10   1         for(i=0;i<8;i++)
+  11   1         {  
+  12   2             control_send=0;  //先发送0.56ms的38KHZ红外波（即编码中0.56ms的高电平）
+  13   2           Delay560us();
+  14   2          //停止发送红外信号（即编码中的低电平）
+  15   2          if(irdata&1)      //判断最低位为1还是0。   低位先发送！！
+  16   2           { control_send=1;  //1为宽电平，1.693ms
+  17   3            Delay1693us();}
+  18   2          else {control_send=1;  //0为窄电平，0.56ms
+  19   3                Delay560us();}
+  20   2             irdata=irdata>>1;     
+  21   2          }
+  22   1      }
+  23          
+  24          void SendIRdata(unsigned char g_iraddr1,unsigned char p_irdata)
+  25          {
+  26   1         //发送9ms的起始码，高电平有38KHZ载波
+  27   1        control_send=0; 
+  28   1          Delay9ms();
+  29   1         //发送4.5ms的结果码，低电平无38KHZ载波
+  30   1        control_send=1; 
+  31   1        Delay4500us();
+  32   1        
+  33   1        //发送十六位地址
+  34   1        SendIRdata_BYTE(g_iraddr1);
+  35   1        uart_senddata(g_iraddr1);
+  36   1        SendIRdata_BYTE(~g_iraddr1);
+  37   1        uart_senddata(~g_iraddr1);
+  38   1          //发送8位数据
+  39   1        SendIRdata_BYTE(p_irdata);
+  40   1        uart_senddata(p_irdata);
+  41   1          //发送8位数据的反码
+  42   1        SendIRdata_BYTE(~p_irdata);
+  43   1        uart_senddata(~p_irdata);
+  44   1         
+  45   1        control_send=0; 
+  46   1           Delay560us();
+  47   1        control_send=1; 
+  48   1      } 
+  49          
+  50          void SendENDdata(unsigned char g_iraddr1,unsigned char p_irdata)
+  51          {
+  52   1         //发送9ms的起始码，高电平有38KHZ载波
+C51 COMPILER V9.56.0.0   INFRARED_EMISSION                                                 11/05/2017 17:57:23 PAGE 2   
+
+  53   1        control_send=0; 
+  54   1          Delay9ms();
+  55   1         //发送4.5ms的结果码，低电平无38KHZ载波
+  56   1        control_send=1; 
+  57   1        Delay4500us();
+  58   1        
+  59   1        //发送十六位地址
+  60   1        SendIRdata_BYTE(g_iraddr1);
+  61   1        SendIRdata_BYTE(g_iraddr1);
+  62   1          //发送8位数据
+  63   1        SendIRdata_BYTE(p_irdata);
+  64   1          //发送8位数据的反码
+  65   1        SendIRdata_BYTE(p_irdata);
+  66   1         
+  67   1        control_send=0; 
+  68   1           Delay560us();
+  69   1        control_send=1; 
+  70   1      } 
+  71          
+  72           void Multiple_sendIRdata(u8 count,u8 ir_adress,u8 dat)
+  73          {
+  74   1            uchar i;
+  75   1            for(i=0;i<count;i++)
+  76   1            {
+  77   2              SendIRdata(ir_adress,dat);
+  78   2              Delay_1ms(10);
+  79   2      //        SendENDdata(0xff,0xff);
+  80   2              
+  81   2            }
+  82   1      } 
+  83          
+  84          void Multiple_send_Temp_IRdata(u8 count,u8 ir_adress)
+  85          {
+  86   1            uchar i;
+  87   1            uchar temp_data=0x00;
+  88   1            uint wsd=0x0000;
+  89   1            for(i=0;i<count;i++)
+  90   1            {
+  91   2              wsd=DHT11();
+  92   2              temp_data=(uchar)(wsd&0x00ff);//温度
+  93   2              if(temp_data==0x00)
+  94   2              temp_data=0x62;
+  95   2              SendIRdata(ir_adress,temp_data);
+  96   2              Delay500ms(); //@11.0592MHz
+  97   2            }
+  98   1      } 
+  99           
+ 100           
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    242    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      16
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

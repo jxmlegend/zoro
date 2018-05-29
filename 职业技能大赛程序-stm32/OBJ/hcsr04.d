@@ -1,0 +1,16 @@
+..\obj\hcsr04.o: ..\HARDWARE\HC-SR04\HCSR04.c
+..\obj\hcsr04.o: ..\USER\stm32f10x.h
+..\obj\hcsr04.o: ..\CORE\core_cm3.h
+..\obj\hcsr04.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\hcsr04.o: ..\USER\system_stm32f10x.h
+..\obj\hcsr04.o: ..\USER\stm32f10x_conf.h
+..\obj\hcsr04.o: ..\STM32F10x_FWLib\inc\stm32f10x_gpio.h
+..\obj\hcsr04.o: ..\USER\stm32f10x.h
+..\obj\hcsr04.o: ..\STM32F10x_FWLib\inc\stm32f10x_rcc.h
+..\obj\hcsr04.o: ..\STM32F10x_FWLib\inc\stm32f10x_tim.h
+..\obj\hcsr04.o: ..\STM32F10x_FWLib\inc\stm32f10x_usart.h
+..\obj\hcsr04.o: ..\STM32F10x_FWLib\inc\misc.h
+..\obj\hcsr04.o: ..\STM32F10x_FWLib\inc\stm32f10x_exti.h
+..\obj\hcsr04.o: ..\SYSTEM\delay\delay.h
+..\obj\hcsr04.o: ..\SYSTEM\sys\sys.h
+..\obj\hcsr04.o: ..\HARDWARE\HC-SR04\HCSR04.h

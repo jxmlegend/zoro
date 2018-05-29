@@ -1,0 +1,16 @@
+..\obj\zigbee.o: ..\HARDWARE\ZigBee\ZigBee.c
+..\obj\zigbee.o: ..\HARDWARE\ZigBee\ZigBee.h
+..\obj\zigbee.o: ..\SYSTEM\sys\sys.h
+..\obj\zigbee.o: ..\USER\stm32f10x.h
+..\obj\zigbee.o: ..\CORE\core_cm3.h
+..\obj\zigbee.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\zigbee.o: ..\USER\system_stm32f10x.h
+..\obj\zigbee.o: ..\USER\stm32f10x_conf.h
+..\obj\zigbee.o: ..\STM32F10x_FWLib\inc\stm32f10x_gpio.h
+..\obj\zigbee.o: ..\USER\stm32f10x.h
+..\obj\zigbee.o: ..\STM32F10x_FWLib\inc\stm32f10x_rcc.h
+..\obj\zigbee.o: ..\STM32F10x_FWLib\inc\stm32f10x_tim.h
+..\obj\zigbee.o: ..\STM32F10x_FWLib\inc\stm32f10x_usart.h
+..\obj\zigbee.o: ..\STM32F10x_FWLib\inc\misc.h
+..\obj\zigbee.o: ..\SYSTEM\usart\usart.h
+..\obj\zigbee.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h

@@ -1,0 +1,25 @@
+# MPLAB IDE generated this makefile for use with GNU make.
+# Project: PM2.5.mcp
+# Date: Fri Oct 27 06:36:32 2017
+
+AS = MPASMWIN.exe
+CC = mcc18.exe
+LD = mplink.exe
+AR = mplib.exe
+RM = rm
+
+PM2.5.cof : PM2.5.o input.o can.o
+	$(LD) /p18F25K80 "PM2.5.o" "input.o" "can.o" /u_CRUNTIME /u_DEBUG /z__MPLAB_BUILD=1 /z__MPLAB_DEBUG=1 /z__MPLAB_DEBUGGER_PK3=1 /z__ICD2RAM=1 /o"PM2.5.cof" /M"PM2.5.map" /W
+
+PM2.5.o : PM2.5.c input.h PM2.5.c E:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/p18f25k80.h const.h configure.h
+	$(CC) -p=18F25K80 "PM2.5.c" -fo="PM2.5.o" -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa-
+
+input.o : input.c input.h input.c const.h configure.h E:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/p18f25k80.h
+	$(CC) -p=18F25K80 "input.c" -fo="input.o" -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa-
+
+can.o : can.c io.h can.h input.h can.c const.h configure.h E:/Program\ Files\ (x86)/Microchip/mplabc18/v3.47/h/p18f25k80.h
+	$(CC) -p=18F25K80 "can.c" -fo="can.o" -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -Ou- -Ot- -Ob- -Op- -Or- -Od- -Opa-
+
+clean : 
+	$(RM) "PM2.5.o" "input.o" "can.o" "PM2.5.cof" "PM2.5.hex"
+

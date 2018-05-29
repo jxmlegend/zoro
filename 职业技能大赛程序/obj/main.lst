@@ -1,0 +1,94 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              11/05/2017 17:57:21 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN ..\obj\main.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\user\main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\src\nrf24l01;..\src\
+                    -ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\light;..\src\motor;..\src
+                    -\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\main.lst) TABS(2) OBJECT(..\obj\main.obj)
+
+line level    source
+
+   1          #include "NRF24L01.H"
+   2          #include "commom.h"
+   3          #include "Infrared_emission.h"
+   4          #include "motor_xunji.h"
+   5          #include "motor.h"
+   6          #include "STC12C5A60S2_PWM.h"
+   7          #include "delay.h"
+   8          #include "color_sensor.h"
+   9          #include "RC.h"
+  10          #include "uart.h"
+  11          #include "HCSR04.h"
+  12          
+  13          u16 stddis;
+  14          
+  15          void main(void)
+  16          {  
+  17   1        P4SW|=0X10;        //将 P4.4口设置成IO口,准双向口
+  18   1         P4M1&=~0X10;
+  19   1         P4M0&=~0X10;
+  20   1         BEEP=1;
+  21   1        
+  22   1         Motor_Init(); 
+  23   1         PWM_ini();
+  24   1      
+  25   1         PWM_Set(70,70);   //PWM使用FOSC作为时钟源所以PWM设置可以只执行一次
+  26   1         Delay_1ms(50);
+  27   1         s2=0;           //初始设定S2引脚
+  28   1         s3=0;           //初始设定S3引脚
+  29   1         t0_init();
+  30   1         UartInit();
+  31   1          init_NRF24L01();        
+  32   1         NRF24L01_FindMyself();           //2401自检 
+  33   1         NRF24L01_TX_Mode(0x00,0x04);             //发送模式
+  34   1         NRF24L01_transmit(0x00);
+  35   1         NRF24L01_transmit(0x00);
+  36   1          P4SW = 0x70;
+  37   1          stddis=1;
+  38   1          
+  39   1        while(1)
+  40   1        {                 
+  41   2            while(Alert_flag>11)
+  42   2              MOTOR_GO_STOP;
+  43   2              if(distance()>stddis)
+  44   2              {
+  45   3                FollowLine(); 
+  46   3                car_task(Alert_flag);
+  47   3                if(Alert_flag==6)//只在第6个路口和 第7个路口之间  颜色检测
+  48   3                { 
+  49   4                 while((red_dat>green_dat))
+  50   4                  { 
+  51   5                     PWM_Set(100,100); //小车减速
+  52   5                     P17=0;
+  53   5                     delay_ms(250);
+C51 COMPILER V9.56.0.0   MAIN                                                              11/05/2017 17:57:21 PAGE 2   
+
+  54   5                     P17=1;
+  55   5                     delay_ms(250);
+  56   5                     MOTOR_GO_STOP;
+  57   5                     delay_ms(250);
+  58   5                     while(red_dat>green_dat);            
+  59   5                   }
+  60   4                    PWM_Set(70,70);
+  61   4                }
+  62   3              }
+  63   2              else
+  64   2              {MOTOR_GO_STOP;}
+  65   2         }
+  66   1      }
+  67          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    228    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

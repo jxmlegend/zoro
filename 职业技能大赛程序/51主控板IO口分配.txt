@@ -1,0 +1,48 @@
+
+/*1、 NRF24L01管脚配置 */
+sbit CE   = P2^0;  // Chip Enable pin signal (output)
+sbit SCK  = P2^1;  // Master Out, Slave In pin (output)	 
+sbit MISO = P2^2;  // Master In, Slave Out pin (input) 
+sbit MOSI = P2^3;  // Serial Clock pin, (output)
+sbit IRQ  = P3^2;  // Interrupt signal, from nRF24L01 (input)
+sbit CSN  = P4^4;  // Slave Select pin, (output to CSN, nRF24L01)
+
+/*2、 循迹端口 */
+#define  xunji  P0
+
+/* 3、直流电机管脚配置 */
+sbit MOTOR_A_CON1=P1^0; 
+sbit MOTOR_A_CON2=P1^1;
+sbit MOTOR_A_EN  =P1^3;            
+sbit MOTOR_B_CON1=P1^2;
+sbit MOTOR_B_CON2=P1^5;
+sbit MOTOR_B_EN  =P1^4;
+
+/*4、红外发射控制端口*/
+sbit control_send=P1^6;
+
+/**5、颜色传感器引脚定义**/  
+sbit s2=P3^4;        //TCS3200 S2 
+sbit s3=P3^6;        //TCS3200 S3
+                     //TCS3200 S0 模块内部默认上拉
+                     //TCS3200 S1 模块内部默认上拉
+                     //TCS3200 OE 模块内部接地
+//TCS3200 OUT 接P3.5	
+
+/*6、zigbee控制端口
+		zibee模块的P0_4与智能小车主控板的P3.7相连
+*/
+sbit zigbee_control=P3^7;
+
+//zibee接串口   02-RXD   03-TXD
+
+/*7、温湿度传感器端口*/
+sbit  DHT11_OUT    =P2^5;	
+
+/*8、蜂鸣器*/
+sbit BEEP=P1^7;
+
+/*9、光照传感器BH1750FVI IO定义*****/
+sbit    BH1750_SCL=P2^6;      //IIC时钟引脚定义
+sbit  	BH1750_SDA=P2^7;      //IIC数据引脚定义
+

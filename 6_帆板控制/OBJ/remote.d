@@ -3,7 +3,7 @@
 ..\obj\remote.o: ..\SYSTEM\sys\sys.h
 ..\obj\remote.o: ..\USER\stm32f10x.h
 ..\obj\remote.o: ..\CORE\core_cm3.h
-..\obj\remote.o: E:\keil\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\remote.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\remote.o: ..\USER\system_stm32f10x.h
 ..\obj\remote.o: ..\USER\stm32f10x_conf.h
 ..\obj\remote.o: ..\STM32F10x_FWLib\inc\stm32f10x_adc.h
@@ -32,4 +32,4 @@
 ..\obj\remote.o: ..\STM32F10x_FWLib\inc\misc.h
 ..\obj\remote.o: ..\SYSTEM\delay\delay.h
 ..\obj\remote.o: ..\SYSTEM\usart\usart.h
-..\obj\remote.o: E:\keil\ARM\ARMCC\Bin\..\include\stdio.h
+..\obj\remote.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdio.h

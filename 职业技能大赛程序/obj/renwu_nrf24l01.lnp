@@ -1,0 +1,18 @@
+"..\obj\STARTUP.obj",
+"..\obj\main.obj",
+"..\obj\uart.obj",
+"..\obj\delay.obj",
+"..\obj\motor_xunji.obj",
+"..\obj\ADC.obj",
+"..\obj\color_sensor.obj",
+"..\obj\dht11.obj",
+"..\obj\Infrared_emission.obj",
+"..\obj\IR_delay.obj",
+"..\obj\STC_BH1750_nicete.obj",
+"..\obj\motor.obj",
+"..\obj\RC.obj",
+"..\obj\NRF24L01.obj",
+"..\obj\STC12C5A60S2_PWM.obj",
+"..\obj\HCSR04.obj" 
+TO "..\obj\renwu_nrf24l01" 
+PRINT("..\obj\renwu_nrf24l01.m51") RAMSIZE(256) 

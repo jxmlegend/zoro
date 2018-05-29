@@ -1,0 +1,44 @@
+C51 COMPILER V9.56.0.0   MOTOR                                                             11/05/2017 17:57:24 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MOTOR
+OBJECT MODULE PLACED IN ..\obj\motor.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\motor\motor.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\src\nrf24l01;..\sr
+                    -c\ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\light;..\src\motor;..\s
+                    -rc\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\motor.lst) TABS(2) OBJECT(..\obj\motor.obj)
+
+line level    source
+
+   1          /****************************************
+   2          文件名称： 四驱智能小车V4.0程序
+   3          时间：2015年8月11日
+   4          版本：V4.0
+   5          说明：
+   6          修改记录：
+   7          ****************************************/  
+   8          #include "motor.h"
+   9          #include "delay.h"
+  10          
+  11          // #include "timer.h"
+  12          
+  13          /**电机初始化**/
+  14          void Motor_Init(void)
+  15          {
+  16   1        MOTOR_A_EN=0;
+  17   1        MOTOR_B_EN=0;
+  18   1        MOTOR_GO_STOP;
+  19   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     13    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

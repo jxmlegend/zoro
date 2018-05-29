@@ -1,0 +1,110 @@
+C51 COMPILER V9.56.0.0   STC12C5A60S2_PWM                                                  11/05/2017 17:57:25 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE STC12C5A60S2_PWM
+OBJECT MODULE PLACED IN ..\obj\STC12C5A60S2_PWM.obj
+COMPILER INVOKED BY: D:\keil5\C51\BIN\C51.EXE ..\src\motor\STC12C5A60S2_PWM.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\src\nrf
+                    -24l01;..\src\ADC;..\src\color_sensor;..\src\delay;..\src\DHT11;..\src\FM_ctrl;..\src\Infrared Sensor;..\src\light;..\src
+                    -\motor;..\src\uart;..\src\user;..\src\HCSR04) DEBUG OBJECTEXTEND PRINT(..\obj\STC12C5A60S2_PWM.lst) TABS(2) OBJECT(..\ob
+                    -j\STC12C5A60S2_PWM.obj)
+
+line level    source
+
+   1          #include "STC12C5A60S2_PWM.h"
+   2          #include <STC12C5A60S2.H>
+   3          
+   4          
+   5          void PWM_ini()
+   6          {
+   7   1        CMOD=0x0C;//¶¨Ê±Æ÷0Òç³öÂÊ×÷ÎªÊ±ÖÓÊäÈë£¬Ñ¡ÔñFOSC/6×÷ÎªÊ±ÖÓÔ´,11.0592MHZ¾§ÕñÊ±£¬PWMÆµÂÊ=11059200/6/256=7.2K
+             -hz        
+   8   1        CL=0x00;//ÇåÁã×ÔÓÉµÝÔö¼ÆÊýµÄ16Î»¶¨Ê±Æ÷µÄÖµ CLµÄÖµÊÇËæPCAµÄÊ±ÖÓÊäÈëµÝÔöµÄ£¬µ±CLµÄÖµµÈÓÚ»ò´óÓÚ£ûEPCnL£¬CCAP
+             -nL£ýÊ±£¬Êä³öÎª¸ß¡£
+   9   1        CH=0x00;//CH0Îª00  ¿´½á¹¹Í¼£¬CLÇ°ÃæÊÇÓÀÔ¶ÊÇ0
+  10   1      
+  11   1          /***PWM0Ïà¹Ø¼Ä´æÆ÷ÉèÖÃ***/
+  12   1        PCA_PWM0=0x00; //EPC0H=0,EPC0L=0 EPC0HºÍCCAP0H×éºÏ³É²¶»ñ¼Ä´æÆ÷£ûEPC0H£¬CCAP0H£ý
+  13   1        //                               EPC0LºÍCCAP0L×éºÏ³É²¶»ñ¼Ä´æÆ÷£ûEPC0L£¬CCAP0L£ý
+  14   1                //  PCA_PWMn: 7 6 5 4 3 2 1 0
+  15   1                //; - - - - - - EPCnH EPCnL
+  16   1        CCAPM0=0x42;//ÉèÖÃECOM1=1,PWM1=1.
+  17   1                    //PCAÄ£¿é0µÄ¹¤×÷Ä£Ê½¼Ä´æÆ÷
+  18   1                      //---------------------------------------
+  19   1                      //7   6    5     4     3    2    1    0
+  20   1                      //- ECM0 CAPP0 CAPN0 MAT0 T0G0 PWM0 ECCF0
+  21   1                      //----1----0-----0----0-----0---1-----0---
+  22   1                      //ECOM0:Ê¹ÄÜ±È½ÏÆ÷£¬1Ê±Ê¹ÄÜ±È½ÏÆ÷¹¦ÄÜ
+  23   1                      //CAPP0£ºÕý²¶»ñ£¬1Ê±Ê¹ÄÜÉÏÉýÑØ²¶»ñ
+  24   1                      //CAPN0£º¸º²¶»ñ£¬1Ê±Ê¹ÄÜÏÂ½µÑØ²¶»ñ
+  25   1                      //MAT0:Æ¥Åä:1Ê±£¬PCA¼ÆÊýÆ÷µÄÖµÓëÄ£¿éµÄ±È½Ï/²¶»ñ¼Ä´æÆ÷µÄÖµÆ¥Åä½«ÖÃÎ»CCON¼Ä´æÆ÷ÖÐ¶Ï±êÖ¾Î»CCF
+             -n
+  26   1                      //T0G0:·­×ª£¬1Ê±£¬¹¤×÷ÔÚPCA¸ßËÙÊä³öÄ£Ê½£¬PCA¼ÆÊýÆ÷µÄÖµÓëÄ£¿éµÄ±È½Ï/²¶»ñ¼Ä´æÆ÷µÄÖµÆ¥Åä½«ÊÇC
+             -EXn½Å·­×ª
+  27   1                      //PWM0:Âö¿íµ÷½ÚÊä³öÄ£Ê½£¬1Ê±£¬Ê¹ÄÜCEXn½ÅÓÃ×öPWMÊä³ö
+  28   1                      //EECF0:Ê¹ÄÜCCFnÖÐ¶Ï£¬Ê¹ÄÜ¼Ä´æÆ÷CCONÖÐµÄ²¶»ñ/±È½Ï±êÖ¾CCFn£¬ÓÃÀ´²úÉúÖÐ¶Ï
+  29   1          /***PWM1Ïà¹Ø¼Ä´æÆ÷ÉèÖÃ***/
+  30   1        PCA_PWM1=0x00;//EPC1H=0,EPC1L=0 EPC1HºÍCCAP0H×éºÏ³É²¶»ñ¼Ä´æÆ÷£ûEPC1H£¬CCAP1H£ý
+  31   1                //EPC1LºÍCCAP0L×éºÏ³É²¶»ñ¼Ä´æÆ÷£ûEPC1L£¬CCAP1L£ý
+  32   1                        //  PCA_PWMn: 7 6 5 4 3 2 1 0
+  33   1                //; - - - - - - EPCnH EPCnL 
+  34   1        CCAPM1=0x42;//ÉèÖÃECOM1=1,PWM1=1.
+  35   1                    //PCAÄ£¿é0µÄ¹¤×÷Ä£Ê½¼Ä´æÆ÷
+  36   1                      //---------------------------------------
+  37   1                      //7   6    5     4     3    2    1    0
+  38   1                      //- ECM1 CAPP1 CAPN1 MAT1 T0G1 PWM1 ECCF1
+  39   1                      //----1----0-----0----0-----0---1-----0---
+  40   1                      //ECOM1:Ê¹ÄÜ±È½ÏÆ÷£¬1Ê±Ê¹ÄÜ±È½ÏÆ÷¹¦ÄÜ
+  41   1                      //CAPP1£ºÕý²¶»ñ£¬1Ê±Ê¹ÄÜÉÏÉýÑØ²¶»ñ
+  42   1                      //CAPN1£º¸º²¶»ñ£¬1Ê±Ê¹ÄÜÏÂ½µÑØ²¶»ñ
+  43   1                      //MAT1:Æ¥Åä:1Ê±£¬PCA¼ÆÊýÆ÷µÄÖµÓëÄ£¿éµÄ±È½Ï/²¶»ñ¼Ä´æÆ÷µÄÖµÆ¥Åä½«ÖÃÎ»CCON¼Ä´æÆ÷ÖÐ¶Ï±êÖ¾Î»CCF
+             -n
+  44   1                      //T0G1:·­×ª£¬1Ê±£¬¹¤×÷ÔÚPCA¸ßËÙÊä³öÄ£Ê½£¬PCA¼ÆÊýÆ÷µÄÖµÓëÄ£¿éµÄ±È½Ï/²¶»ñ¼Ä´æÆ÷µÄÖµÆ¥Åä½«ÊÇC
+             -EXn½Å·­×ª
+  45   1                      //PWM1:Âö¿íµ÷½ÚÊä³öÄ£Ê½£¬1Ê±£¬Ê¹ÄÜCEXn½ÅÓÃ×öPWMÊä³ö
+  46   1                      //EECF1:Ê¹ÄÜCCFnÖÐ¶Ï£¬Ê¹ÄÜ¼Ä´æÆ÷CCONÖÐµÄ²¶»ñ/±È½Ï±êÖ¾CCFn£¬ÓÃÀ´²úÉúÖÐ¶Ï
+C51 COMPILER V9.56.0.0   STC12C5A60S2_PWM                                                  11/05/2017 17:57:25 PAGE 2   
+
+  47   1                                                                                                               
+  48   1        /***Æô¶¯PCAÕóÁÐ¼ÆÊý***/
+  49   1        CR=1;//CR=1,Æô¶¯PCAÕóÁÐ¼ÆÊý¡£  ¿´151Ò³£¬ÆäÖÐºÍCMODµÄCIDLÎ»ÓÐ¹Ø£¬ÓÖºÍIDLEÓÐ¹Ø£¬¿´183Ò³¡£
+  50   1          /***½«PWMÊä³ö¶ËÉèÖÃÔÚP4¿Ú***/
+  51   1          /***40½ÅSTCµ¥Æ¬»ú²»ÄÜÉèÖÃ***/
+  52   1        //AUXR1=0xc0;//PWM0´ÓP1.3ÇÐ»»µ½P4.2
+  53   1                       //PWM1´ÓP1.4ÇÐ»»µ½P4.3                                                                         
+             -                                                                                                                        
+             -                        
+  54   1      
+  55   1      }
+  56          
+  57          void PWM_Set(unsigned char PWM0_DATA,unsigned char PWM1_DATA)
+  58          {
+  59   1              CCAP0L=PWM0_DATA;//×°Èë±È½Ï³õÖµ
+  60   1              CCAP0H=PWM0_DATA;
+  61   1              CCAP1L=PWM1_DATA;//×°Èë±È½Ï³õÖµ
+  62   1              CCAP1H=PWM1_DATA;
+  63   1      }
+  64          
+  65          //Ñ¡ÔñFOSC/6×÷ÎªÊ±ÖÓÔ´,11.0592MHZ¾§ÕñÊ±£¬PWMÆµÂÊ=11059200/6/256=7.2Khz
+  66          //Ò»¸öÖÜÆÚ=1/7.2K= 0.1388ms
+  67          //Ò»¸öÖÜÆÚ·Ö³É256·Ý=0.1388ms/256=0.0005421875ms
+  68          
+  69          //ÓÉÓÚµ±CLµÄÖµµÈÓÚ»ò´óÓÚ£ûEPCnL£¬CCAPnL£ýÊ±£¬Êä³öÎª¸ß¡£ÏÂÃæÉèÖÃCLÎª0£¬ËùÒÔ£º
+  70          //¾ÙÀýPWM0¼ÆËã·½·¨£¨PWM1Ò²Ò»Ñù£©£º
+  71          //¸ßµçÆ½Âö³åÊ±¼äµÈÓÚµÍµçÆ½Âö³åµÄÊ±ºò£ºCCAP0L=127;CCAP0H=127;  ¸ßµÍµçÆ½µÄÊ±¼ä128*0.0005421875ms=0.0694ms£¬Ò
+             -»¸öÖÜÆÚÔ¼Îª0.0694ms X 2 = 0.1388ms
+  72          //¸ßµçÆ½Âö³åÊ±¼ä¼ÆËã£º£¨256-CCAP0L£©X 0.0005421875ms
+  73          //µÍµçÆ½Âö³åÊ±¼ä¼ÆËã£ºCCAP0L X 0.0005421875ms
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     30    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

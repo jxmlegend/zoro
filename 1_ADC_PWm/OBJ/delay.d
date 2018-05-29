@@ -2,7 +2,7 @@
 ..\obj\delay.o: ..\MY\inc\delay.h
 ..\obj\delay.o: ..\CMSIS\stm32f10x.h
 ..\obj\delay.o: ..\CMSIS\core_cm3.h
-..\obj\delay.o: E:\keil\ARM\ARMCC\Bin\..\include\stdint.h
+..\obj\delay.o: D:\keil5\ARM\ARMCC\Bin\..\include\stdint.h
 ..\obj\delay.o: ..\CMSIS\system_stm32f10x.h
 ..\obj\delay.o: ..\USER\stm32f10x_conf.h
 ..\obj\delay.o: ..\FWLib\inc\stm32f10x_adc.h
