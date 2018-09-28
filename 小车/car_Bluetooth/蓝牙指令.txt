@@ -1,0 +1,69 @@
+ÃüÁî £º	°´ÏÂ<BUPD>	ËÉ¿ª<BUPU>
+	    <BDND>	    <BDNU> 
+	    <BLTD>	    <BLTU> 
+	    <BRTD>	    <BRTU> 
+
+<+>  <->
+
+
+void BluetoothCar_cmd()
+{
+	u8 i;
+	if(U1_Rev_Done)
+	{
+		if(U1_Rec_Buff[0] == '<' && (U1_Rec_Buff[1] == 'B') && (U1_Rec_Buff[2] == 'U') 
+						&& (U1_Rec_Buff[3] == 'P') && (U1_Rec_Buff[4] == 'D') && (U1_Rec_Buff[5] == '>'))//?¡ÀDD 
+		{
+			straight();
+			TIM_SetCompare1(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare2(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare3(TIM3,1500);
+		}    
+		if(U1_Rec_Buff[0] == '<' && (U1_Rec_Buff[1] == 'B') && (U1_Rec_Buff[2] == 'D') 
+				&& (U1_Rec_Buff[3] == 'N') && (U1_Rec_Buff[4] == 'D') && (U1_Rec_Buff[5] == '>'))//o¨®¨ª?
+		{
+			turn_back();
+			TIM_SetCompare1(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare2(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare3(TIM3,1500);
+		} 
+
+	 if(U1_Rec_Buff[0] == '<' && (U1_Rec_Buff[1] == 'B') && (U1_Rec_Buff[2] == 'L') 
+				&& (U1_Rec_Buff[3] == 'T') && (U1_Rec_Buff[4] == 'D') && (U1_Rec_Buff[5] == '>'))//¡Á¨®¡Áa 
+		{
+			turn_left();
+			TIM_SetCompare1(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare2(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare3(TIM3,1100);
+		} 
+	 if(U1_Rec_Buff[0] == '<' && (U1_Rec_Buff[1] == 'B') && (U1_Rec_Buff[2] == 'R') 
+				&& (U1_Rec_Buff[3] == 'T') && (U1_Rec_Buff[4] == 'D') && (U1_Rec_Buff[5] == '>'))//¨®¨°¡Áa 
+		{
+			turn_right();
+			TIM_SetCompare1(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare2(TIM3,speed);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare3(TIM3,1900);
+		} 
+	 if(U1_Rec_Buff[0] == '<' && (U1_Rec_Buff[1] == 'B') && (U1_Rec_Buff[4] == 'U') && (U1_Rec_Buff[5] == '>'))//¨ª¡ê?1 
+		{
+			turn_stop();
+			TIM_SetCompare1(TIM3,0);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare2(TIM3,0);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare3(TIM3,1500);
+		}
+		if(U1_Rec_Buff[0] == '<' && (U1_Rec_Buff[1] == '+') && (U1_Rec_Buff[2] == '>'))
+		{
+			TIM_SetCompare1(TIM3,speed+=1000);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare2(TIM3,speed+=1000);//¨¦¨¨??3¦Ì??¡Áa?¨´
+		}
+		if(U1_Rec_Buff[0] == '<' && (U1_Rec_Buff[1] == '-') && (U1_Rec_Buff[2] == '>'))
+		{
+			TIM_SetCompare1(TIM3,speed-=1000);//¨¦¨¨??3¦Ì??¡Áa?¨´
+			TIM_SetCompare2(TIM3,speed-=1000);//¨¦¨¨??3¦Ì??¡Áa?¨´
+		}
+		
+		for(i=0;i<50;i++) 
+			U1_Rec_Buff[i]=0;
+		U1_Rev_Done=0;
+	}
+}
